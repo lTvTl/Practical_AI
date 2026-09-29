@@ -1,0 +1,5 @@
+numpy>=1.23.0,<2.0
+scikit-learn==1.0.2
+scipy==1.11.4
+Pillow>=8.0.0
+pyinstaller>=6.0

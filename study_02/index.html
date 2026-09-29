@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Task Tracker - 할 일 관리</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Canvas for celebration confetti -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-top">
+        <div class="title-group">
+          <h1 class="app-title">Daily Task</h1>
+          <span class="streak-badge" id="streakBadge" title="연속 목표 달성일">🔥 0일 연속</span>
+        </div>
+        <div class="header-actions">
+          <span class="current-date" id="currentDate">2026. 00. 00</span>
+          <!-- Theme Toggle Button -->
+          <button id="themeToggleBtn" class="icon-btn theme-btn" aria-label="테마 전환" title="다크/라이트 모드 전환">
+            <span class="theme-icon-light">☀️</span>
+            <span class="theme-icon-dark">🌙</span>
+          </button>
+        </div>
+      </div>
+      <p class="app-subtitle">오늘의 목표를 달성해보세요</p>
+
+      <!-- Progress Section -->
+      <div class="progress-card">
+        <div class="progress-info">
+          <div class="progress-title-wrap">
+            <span class="progress-label">오늘의 달성률</span>
+            <span class="celebration-badge" id="celebrationBadge" style="display: none;">🎉 올클리어!</span>
+          </div>
+          <span class="progress-percent" id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+        <div class="stats-summary">
+          <div class="stat-item">
+            <span class="stat-num" id="totalCount">0</span>
+            <span class="stat-desc">전체 할 일</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-num active-num" id="activeCount">0</span>
+            <span class="stat-desc">진행 중</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-num done-num" id="completedCount">0</span>
+            <span class="stat-desc">완료됨</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-num star-num" id="starredCount">0</span>
+            <span class="stat-desc">중요(⭐)</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Routine Management Bar -->
+    <section class="routine-bar">
+      <span class="routine-tip">📅 새로운 하루를 위해 완료된 항목을 정리할까요?</span>
+      <button id="newDayBtn" class="routine-btn" title="완료된 할 일을 아카이브하고 새로운 하루를 시작합니다">
+        ☀️ 새 하루 시작
+      </button>
+    </section>
+
+    <!-- Task Input Form -->
+    <section class="input-section">
+      <form id="todoForm" class="todo-form" onsubmit="return false;">
+        <div class="input-row">
+          <input 
+            type="text" 
+            id="todoInput" 
+            class="todo-input" 
+            placeholder="새로운 할 일을 입력하세요... (Enter)"
+            autocomplete="off"
+            required
+          />
+          <button type="button" id="starInputToggle" class="star-toggle-btn" title="중요 할 일로 등록" aria-label="중요 표시">
+            <span class="star-icon">⭐</span>
+          </button>
+          <button type="submit" id="addBtn" class="add-btn" aria-label="할 일 추가">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>추가</span>
+          </button>
+        </div>
+
+        <!-- Category Selector & Auto-Classify -->
+        <div class="category-control-wrap">
+          <div class="category-header">
+            <span class="category-label-title">카테고리</span>
+            <label class="auto-classify-toggle" title="할 일 입력 시 키워드를 분석하여 카테고리를 자동으로 추천/선택합니다">
+              <input type="checkbox" id="autoClassifyToggle" checked />
+              <span class="toggle-slider"></span>
+              <span class="toggle-text">⚡ 키워드 자동 분류</span>
+            </label>
+          </div>
+
+          <div class="category-select-group">
+            <label class="category-radio work">
+              <input type="radio" name="inputCategory" value="work" checked />
+              <span class="chip">💼 업무</span>
+            </label>
+            <label class="category-radio personal">
+              <input type="radio" name="inputCategory" value="personal" />
+              <span class="chip">🌿 개인</span>
+            </label>
+            <label class="category-radio study">
+              <input type="radio" name="inputCategory" value="study" />
+              <span class="chip">📚 공부</span>
+            </label>
+          </div>
+
+          <!-- Auto-Classification Live Hint -->
+          <div id="autoClassifyHint" class="auto-classify-hint" style="display: none;">
+            <span class="hint-icon">⚡</span>
+            <span class="hint-text" id="autoHintText"></span>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Search Bar -->
+    <section class="search-section">
+      <div class="search-wrapper">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="할 일 검색 (키워드 입력)..." />
+        <button id="clearSearchBtn" class="clear-search-btn" style="display: none;" title="검색어 지우기">&times;</button>
+      </div>
+    </section>
+
+    <!-- Filter Controls -->
+    <section class="filter-section">
+      <div class="filter-tabs" id="categoryFilterTabs">
+        <button class="filter-tab active" data-category="all">전체</button>
+        <button class="filter-tab work-tab" data-category="work">업무</button>
+        <button class="filter-tab personal-tab" data-category="personal">개인</button>
+        <button class="filter-tab study-tab" data-category="study">공부</button>
+      </div>
+
+      <div class="status-filters" id="statusFilterTabs">
+        <button class="status-tab active" data-status="all">모두</button>
+        <button class="status-tab" data-status="active">진행 중</button>
+        <button class="status-tab" data-status="completed">완료</button>
+        <button class="status-tab" data-status="starred">⭐ 중요</button>
+      </div>
+    </section>
+
+    <!-- Drag & Drop Instruction Hint -->
+    <div class="drag-hint">
+      <span>⋮⋮ 항목을 드래그하여 순서를 바꿀 수 있습니다</span>
+    </div>
+
+    <!-- Todo List -->
+    <main class="list-section">
+      <ul class="todo-list" id="todoList">
+        <!-- Rendered dynamically by app.js -->
+      </ul>
+
+      <!-- Empty State -->
+      <div class="empty-state" id="emptyState" style="display: none;">
+        <div class="empty-icon">✨</div>
+        <p class="empty-text">등록된 할 일이 없습니다.</p>
+        <p class="empty-subtext">새로운 목표를 추가해 활기찬 하루를 시작해보세요!</p>
+      </div>
+    </main>
+
+    <!-- Backup, Restore, and Clear Footer Actions -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <button id="exportBackupBtn" class="footer-btn" title="할 일 데이터를 JSON 파일로 다운로드">
+          📥 백업 저장
+        </button>
+        <button id="importBackupBtn" class="footer-btn" title="백업된 JSON 파일 불러오기">
+          📤 백업 복원
+        </button>
+        <input type="file" id="backupFileInput" accept=".json" style="display: none;" />
+      </div>
+      <div class="footer-right">
+        <button id="clearCompletedBtn" class="footer-btn danger" title="완료된 항목만 일괄 삭제">
+          완료 항목 정리
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
