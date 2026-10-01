@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>정보처리기사 기출 퀴즈 게임</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- 헤더 / 유틸리티 바 -->
+    <header class="top-nav">
+      <div class="brand-badge">
+        <span class="brand-icon">💻</span>
+        <span class="brand-title">정보처리기사 CBT</span>
+      </div>
+      <div class="header-controls">
+        <button id="soundToggleBtn" class="icon-btn" title="효과음 켜기/끄기" aria-label="사운드 토글">
+          <span id="soundIcon">🔊</span>
+        </button>
+        <button id="themeToggleBtn" class="icon-btn" title="다크 모드 전환" aria-label="테마 토글">
+          <span id="themeIcon">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="main-card">
+      <!-- 1. 시작 화면 (Intro Screen) -->
+      <section id="introScreen" class="screen active">
+        <div class="intro-content">
+          <div class="hero-badge">2026 최신 기출문제 은행</div>
+          <h1 class="game-title">정보처리기사<br><span class="accent-text">기출 퀴즈 게임</span></h1>
+          <p class="game-description">
+            실제 시험 기출문제를 게임처럼 재미있게 풀어보세요!<br>
+            매 라운드 <strong>무작위 10문제</strong>와 즉각적인 해설이 제공됩니다.
+          </p>
+
+          <div class="feature-tags">
+            <span class="tag">⚡ 4지선다 10문제</span>
+            <span class="tag">💡 즉각 피드백 & 상세해설</span>
+            <span class="tag">⏱️ 실시간 타이머</span>
+            <span class="tag">🏆 랭킹 챌린지</span>
+          </div>
+
+          <button id="startQuizBtn" class="btn btn-primary btn-large btn-glow">
+            <span>🚀 기출문제 10개 풀기</span>
+          </button>
+        </div>
+
+        <!-- 시작 화면 TOP 5 랭킹 미리보기 -->
+        <div class="intro-leaderboard-box">
+          <div class="box-header">
+            <h3>🏆 명예의 전당 (TOP 5)</h3>
+            <button id="openLeaderboardFromIntro" class="text-link-btn">전체 순위 &gt;</button>
+          </div>
+          <div id="introTop5List" class="top5-list">
+            <!-- 자바스크립트로 렌더링 -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. 게임 화면 (In-Game Screen) -->
+      <section id="gameScreen" class="screen">
+        <!-- 인게임 상단 상태바 -->
+        <div class="quiz-status-bar">
+          <div class="status-left">
+            <span class="badge question-count-badge" id="currentQuestionNum">문제 1 / 10</span>
+            <span class="badge subject-badge" id="currentSubject">소프트웨어 설계</span>
+          </div>
+          <div class="status-right">
+            <div class="timer-display" id="timerDisplay">
+              <span class="timer-icon">⏱️</span>
+              <span id="timerText">00:00</span>
+            </div>
+            <button id="quitQuizBtn" class="btn btn-secondary btn-sm" title="처음으로 돌아가기">포기하기</button>
+          </div>
+        </div>
+
+        <!-- 진행도 프로그레스 바 -->
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="progressBarFill" style="width: 10%;"></div>
+        </div>
+
+        <!-- 문제 카드 영역 -->
+        <div class="question-card">
+          <div class="question-header">
+            <span class="q-icon">Q.</span>
+            <h2 class="question-text" id="questionText">문제 텍스트가 여기에 표시됩니다.</h2>
+          </div>
+
+          <!-- 보기 4개 버튼 영역 -->
+          <div class="options-grid" id="optionsContainer">
+            <!-- JS로 4개의 옵션 버튼 동적 렌더링 -->
+          </div>
+        </div>
+
+        <!-- 하단 피드백 및 해설 영역 (정답 선택 후 슬라이드 노출) -->
+        <div class="feedback-panel" id="feedbackPanel">
+          <div class="feedback-header" id="feedbackHeader">
+            <span class="feedback-icon" id="feedbackIcon">✅</span>
+            <span class="feedback-title" id="feedbackTitle">정답입니다!</span>
+          </div>
+          <div class="explanation-box" id="explanationBox">
+            <div class="explanation-label">💡 핵심 해설</div>
+            <p class="explanation-text" id="explanationText">상세 해설이 여기에 표시됩니다.</p>
+          </div>
+          <div class="feedback-actions">
+            <button id="nextQuestionBtn" class="btn btn-primary btn-large">
+              <span id="nextBtnText">다음 문제 ➔</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. 결과 화면 (Result Screen) -->
+      <section id="resultScreen" class="screen">
+        <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+        <div class="result-content">
+          <div class="result-badge-icon" id="resultMedalIcon">🏅</div>
+          <h2 class="result-status-title" id="resultStatusTitle">축하합니다! 합격권입니다!</h2>
+          <p class="result-subtext" id="resultSubText">정보처리기사 필기 기준(60점)을 넘겼습니다.</p>
+
+          <div class="score-card">
+            <div class="score-main">
+              <span class="score-number" id="resultScore">8</span>
+              <span class="score-divider">/</span>
+              <span class="score-total">10</span>
+            </div>
+            <div class="score-percentage" id="resultPercentage">정답률 80% (80점)</div>
+
+            <div class="result-meta-grid">
+              <div class="meta-item">
+                <span class="meta-label">⏱️ 총 소요 시간</span>
+                <span class="meta-value" id="resultElapsedTime">01분 24초</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">🎯 평균 문제당 시간</span>
+                <span class="meta-value" id="resultAvgTime">8.4초</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 닉네임 등록 폼 -->
+          <div class="rank-register-card" id="rankRegisterCard">
+            <h4 class="register-title">🏆 순위표에 내 기록 등록하기</h4>
+            <div class="register-input-group">
+              <input type="text" id="nicknameInput" class="text-input" placeholder="닉네임 입력 (2~10자)" maxlength="10">
+              <button id="submitScoreBtn" class="btn btn-primary">등록하기</button>
+            </div>
+            <p id="registerFeedback" class="register-msg"></p>
+          </div>
+
+          <!-- 결과 액션 버튼들 -->
+          <div class="result-actions">
+            <button id="viewLeaderboardBtn" class="btn btn-secondary">
+              <span>📊 전체 순위표 보기</span>
+            </button>
+            <button id="restartQuizBtn" class="btn btn-primary">
+              <span>🔄 다시 풀기</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 전체 랭킹 모달 (Leaderboard Modal) -->
+    <div id="leaderboardModal" class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <span class="modal-icon">🏆</span>
+            <h3>정보처리기사 순위표</h3>
+          </div>
+          <button id="closeModalBtn" class="close-modal-btn" aria-label="닫기">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <p class="modal-caption">점수 높은 순 &gt; 소요 시간 짧은 순으로 랭킹이 결정됩니다.</p>
+          
+          <div class="table-container">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th style="width: 15%;">순위</th>
+                  <th style="width: 35%;">닉네임</th>
+                  <th style="width: 25%;">점수</th>
+                  <th style="width: 25%;">소요 시간</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboardTableBody">
+                <!-- 자바스크립트로 랭킹 행 렌더링 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="clearLeaderboardBtn" class="btn btn-danger btn-sm">기록 초기화</button>
+          <button id="closeModalBtn2" class="btn btn-secondary btn-sm">닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer class="app-footer">
+      <p>Practical AI - 정보처리기사 기출 퀴즈 웹 애플리케이션 (Zero-Dependency Vanilla JS)</p>
+    </footer>
+  </div>
+
+  <!-- 기출문제 데이터베이스 및 앱 로직 스크립트 -->
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
